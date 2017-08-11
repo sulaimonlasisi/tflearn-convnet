@@ -2,6 +2,7 @@ import os, shutil, argparse
 from glob import glob
 from helper_files import change_image, train
 
+
 '''
 Main file that does the following processes needed to train images.
 Some steps can be skipped based on the amount of samples available
@@ -90,12 +91,12 @@ train.train_image(cnn_args)
 Step 5 - Delete all the splits
          Delete all the flips as well
 '''
-if any(folder.split('_')[0] == 'split' for folder in dirlists):  
+if any(folder.split('_')[0] == 'split' for folder in folders):  
   for item in folders:
-    shutil.rmtree(item)
+    shutil.rmtree(os.path.join(image_dir, item))
 
 for cls in args.classes:
-  for f in glob(os.path.join(image_dir, cls,'*mirr*'):
+  for f in glob(os.path.join(image_dir, cls,'*mirr*')):
     os.remove(f)
 
 #print(dirlist)

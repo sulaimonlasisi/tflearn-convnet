@@ -21,6 +21,7 @@ from tflearn.data_preprocessing import ImagePreprocessing
 from tflearn.data_augmentation import ImageAugmentation
 from tflearn.metrics import Accuracy
 
+
 ###################################
 ### Import picture files 
 ###################################
@@ -30,7 +31,7 @@ def train_image(args):
   class_files = {}
   num_files = 0
   for folder in args['folders']:
-    classes_file_paths[folder] = os.path.join(args['image_dir'], folder, '*.png')
+    classes_file_paths[folder] = os.path.join(args['image_dir'], folder, '*g') #this will capture png and jpg files
     class_files[folder] = sorted(glob(classes_file_paths[folder]))
     num_files+=len(class_files[folder])
   print(num_files)
@@ -121,13 +122,15 @@ def train_image(args):
                      loss='categorical_crossentropy',
                      learning_rate=0.001, metric=acc)
 
+  
+  main_dir = os.path.dirname(os.path.dirname(os.getcwd()))
   # Wrap the network in a model object
-  model = tflearn.DNN(network, tensorboard_verbose=0, best_checkpoint_path = args['id']+'.tfl.ckpt', best_val_accuracy = args['accuracy'])
+  model = tflearn.DNN(network, tensorboard_verbose=0, max_checkpoints = 2, best_checkpoint_path = os.path.join(main_dir, args['id']+'.tfl.ckpt'), best_val_accuracy = args['accuracy'])
 
   ###################################
-  # Train model for 100 epochs
+  # Train model for args['epoch'] epochs
   ###################################
-  # Train it! We'll do 100 training passes and monitor it as it goes.
+  # Train it!
   model.fit(X, Y, n_epoch=args['epoch'], shuffle=True, validation_set=(X_test, Y_test),
           show_metric=True, batch_size=args['batches'],
           snapshot_epoch=True,
@@ -135,6 +138,6 @@ def train_image(args):
   print("Done with training")
 
   # Save model when training is complete to a file
-  model.save(args['id']+'.tfl')
-  print('Network trained and saved as', args['id']+'.tfl')
+  model.save(os.path.join(main_dir, args['id']+'.tfl'))
+  print('Network trained and saved as', os.path.join(main_dir, args['id']+'.tfl'))
 
