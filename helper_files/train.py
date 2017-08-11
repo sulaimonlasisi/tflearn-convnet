@@ -137,3 +137,4 @@ def train_image(args):
   # Save model when training is complete to a file
   model.save(args['id']+'.tfl')
   print('Network trained and saved as', args['id']+'.tfl')
+
