@@ -20,6 +20,6 @@ How to Use:
 	  --id: default = 'cnn'. ID used to save model upon completion
 	  --test: type=float, default = 0.2. Fraction of samples to use for validation
 	  --accuracy: type=float, default = 0.9. Accuracy at which session is saved to best checkpoint path
-	Example usage: python learn.py images_folder list_of_classes --split 0 --flip 1 --test 0.1
+	Example usage: python learn.py images_folder car bike --split 0 --flip 1 --test 0.1
 
 	This will run for a while and save the CNN to specified folder.
