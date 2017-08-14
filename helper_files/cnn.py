@@ -16,6 +16,8 @@ from tflearn.metrics import Accuracy
 import scipy
 import argparse
 from .model import createCNN
+import collections
+import pdb
 
 
 
@@ -23,40 +25,45 @@ from .model import createCNN
 ### Create Test/Train Split of Imported Images
 ###################################
 def import_sample_objects(args):
-  classes_file_paths = {}
-  class_files = {}
+  classes_file_paths = collections.OrderedDict()
+  class_files = collections.OrderedDict()
   num_files = 0
+  print(args['folders'])
   for folder in args['folders']:
-    classes_file_paths[folder] = os.path.join(args['image_dir'], folder, '*g') #this will capture png and jpg files
+    print(folder)
+    classes_file_paths[folder] = os.path.join(args['image_dir'], folder, '*.*g') #this will capture png and jpg files
     class_files[folder] = sorted(glob(classes_file_paths[folder]))
     num_files+=len(class_files[folder])
   allX = np.zeros((num_files, args['size'], args['size'], 3), dtype='float64')
   ally = np.zeros(num_files)
   count = 0
+  class_ctr = 0
   for key, value in class_files.items():
+    print(key)
     for f in value:
       try:
         img = io.imread(f)
         new_img = imresize(img, (args['size'], args['size'], 3))
         allX[count] = np.array(new_img)
-        ally[count] = 0
+        ally[count] = class_ctr
         count += 1
       except:
         continue
-  return (allX, ally, count)
+    class_ctr+=1
+  return allX, ally
   
 
 ###################################
 # Prepare train & test samples
 ###################################
-def split_and_categorize_samples(args, x_y_count_list):
+def split_and_categorize_samples(args, allX, ally):
   # test-train split   
-  X, X_test, Y, Y_test = train_test_split(x_y_count_list[0], x_y_count_list[1], test_size=args['test'], random_state=int(args['test']*x_y_count_list[2]))
+  X, X_test, Y, Y_test = train_test_split(allX, ally, test_size=args['test'])
 
   # encode the Ys
   Y = to_categorical(Y, len(args['folders']))
   Y_test = to_categorical(Y_test, len(args['folders']))
-  return (X, X_test, Y, Y_test)
+  return X, X_test, Y, Y_test
 
   
 
@@ -64,11 +71,11 @@ def split_and_categorize_samples(args, x_y_count_list):
 # Create, train and save model
 ###################################
 def train_cnn(args):
-  x_y_count_list = import_sample_objects(args)
-  x_y_train_test_list = split_and_categorize_samples(args, x_y_count_list)
+  allX, ally = import_sample_objects(args)
+  X, X_test, Y, Y_test = split_and_categorize_samples(args, allX, ally)
 
   #create cnn_model
-  cnn_args = {}
+  cnn_args = collections.OrderedDict()
   cnn_args['size'] = args['size']
   cnn_args['id'] = args['id']
   cnn_args['accuracy'] = args['accuracy']
@@ -78,8 +85,8 @@ def train_cnn(args):
   # Train model for args['epoch'] epochs
   ###################################
   # Train it!
-  model.fit(x_y_train_test_list[0], x_y_train_test_list[2], n_epoch=args['epoch'], 
-       shuffle=True, validation_set=(x_y_train_test_list[1], x_y_train_test_list[3]),
+  model.fit(X, Y, n_epoch=args['epoch'], 
+       shuffle=True, validation_set=(X_test, Y_test),
         show_metric=True, batch_size=args['batches'],
         snapshot_epoch=True,
         run_id=args['id'])
@@ -135,7 +142,7 @@ def test_cnn(ckpt_id, classes_list_file, test_folder):
   train_cnn before training.
   '''
   metrics_array = np.zeros([2, 3], dtype=int)
-  cnn_args = {}
+  cnn_args = collections.OrderedDict()
   cnn_args['size'] = 256
   cnn_args['id'] = 'cnn'
   cnn_args['accuracy'] = 0.9

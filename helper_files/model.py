@@ -19,6 +19,7 @@ def createCNN(args):
   model_exit_activation = 'softmax'
   max_pool_kernel_size = 2
   model_learning_rate = 0.001
+  num_classes = 2
   ###################################
   # Image transformations
   ###################################
@@ -34,6 +35,8 @@ def createCNN(args):
   img_aug = ImageAugmentation()
   img_aug.add_random_flip_leftright()
   img_aug.add_random_rotation(max_angle=25.)
+  img_aug.add_random_blur(sigma_max=3.)
+
 
   ###################################
   # Define network architecture
@@ -45,29 +48,30 @@ def createCNN(args):
                      data_augmentation=img_aug)
 
   # 1: Convolution layer with 32 filters, each 3x3x3
-  conv_1 = conv_2d(network, size_entry_filter, filter_size, activation=model_main_activation, name='conv_1')
+  network = conv_2d(network, size_entry_filter, filter_size, activation=model_main_activation)
 
   # 2: Max pooling layer
-  network = max_pool_2d(conv_1, max_pool_kernel_size)
+  network = max_pool_2d(network, max_pool_kernel_size)
 
   # 3: Convolution layer with 64 filters
-  conv_2 = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation, name='conv_2')
+  network = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation)
 
   # 4: Convolution layer with 64 filters
-  conv_3 = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation, name='conv_3')
+  network = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation)
 
   # 5: Max pooling layer
-  network = max_pool_2d(conv_3, max_pool_kernel_size)
+  network = max_pool_2d(network, max_pool_kernel_size)
+  
 
   # 6: Convolution layer with 64 filters
-  conv_4 = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation, name='conv_4')
+  network = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation)
 
   # 7: Convolution layer with 64 filters
-  conv_5 = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation, name='conv_5')
+  network = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation)
 
   # 8: Max pooling layer
-  network = max_pool_2d(conv_5, max_pool_kernel_size)
-
+  network = max_pool_2d(network, max_pool_kernel_size)
+  
   # 9: Fully-connected 512 node layer
   network = fully_connected(network, 512, activation=model_main_activation)
 
@@ -75,7 +79,7 @@ def createCNN(args):
   network = dropout(network, 0.5)
 
   # 11: Fully-connected layer with two outputs
-  network = fully_connected(network, 2, activation=model_exit_activation)
+  network = fully_connected(network, num_classes, activation=model_exit_activation)
 
   # Configure how the network will be trained
   acc = Accuracy(name="Accuracy")
@@ -86,5 +90,7 @@ def createCNN(args):
   
   #main_dir = os.path.dirname(os.path.dirname(os.getcwd()))
   # Wrap the network in a model object
-  model = tflearn.DNN(network, tensorboard_verbose=0, max_checkpoints = 2, best_checkpoint_path = os.path.join(os.path.dirname(os.path.dirname(os.getcwd())), args['id']+'.tfl.ckpt'), best_val_accuracy = args['accuracy'])
+  model = tflearn.DNN(network, tensorboard_verbose=0, max_checkpoints = 2,
+    best_checkpoint_path = os.path.join(os.path.dirname(os.path.dirname(os.getcwd())), args['id']+'.tfl.ckpt'), 
+    best_val_accuracy = args['accuracy'])
   return model

@@ -32,7 +32,7 @@ How to Use:
       
       --id: default = 'cnn'. ID used to save model upon completion
       
-      --test: type=float, default = 0.2. Fraction of samples to use for validation
+      --test: type=float, default = 0.25. Fraction of samples to use for validation
       
       --accuracy: type=float, default = 0.9. Accuracy at which session is saved to best checkpoint path
       

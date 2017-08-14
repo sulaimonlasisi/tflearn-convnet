@@ -1,6 +1,7 @@
 import os, shutil, argparse
 from glob import glob
 from helper_files import prepare_images, cnn
+import collections
 
 
 '''
@@ -22,11 +23,11 @@ parser.add_argument('--size', type=int, default = 256, help='Size of image relev
 parser.add_argument('--epoch', type=int, default = 100, help='Number of epochs to run')
 parser.add_argument('--batches', type=int, default = 96, help='Size of each batch through iteration')
 parser.add_argument('--id', default = 'cnn', help='Label for the CNN that will be created')
-parser.add_argument('--test', type=float, default = 0.1, help='Fraction of samples to use for validation')
+parser.add_argument('--test', type=float, default = 0.25, help='Fraction of samples to use for validation')
 parser.add_argument('--accuracy', type=float, default = 0.9, help='Accuracy at which session is saved to best checkpoint path')
 args = parser.parse_args()
 
-training_args = {}
+training_args = collections.OrderedDict()
 training_args['size'] = args.size
 training_args['epoch'] = args.epoch
 training_args['batches'] = args.batches
@@ -80,6 +81,7 @@ if any(folder.split('_')[0] == 'split' for folder in dirlist):
   #print(folders)
 else:
   folders = dirlist
+#print(folders)
 training_args['folders'] = folders
 training_args['image_dir'] = image_dir
 cnn.train_cnn(training_args)
