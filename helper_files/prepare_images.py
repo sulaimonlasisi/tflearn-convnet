@@ -16,7 +16,7 @@ def split_images(idx, images_folder, cls, num_splits):
       file_name = os.path.join(images_folder, cls, file)
       tiles = image_slicer.slice(file_name, num_splits, save = False)      
       image_slicer.save_tiles(tiles, directory=os.path.join(images_folder, 'split_'+cls),prefix=get_basename(file_name))
-  print('Class', idx, 'set of images split.')
+  #print('Class', idx, 'set of images split.')
 
 
 
@@ -35,4 +35,4 @@ def flip_images(cls, class_folder):
       mirror_name = file.split('.')[0]+flip_suffix
       os.chdir(class_folder)
       mirror_image.save(mirror_name)
-  print('Class', cls, 'set of images flipped.')
+  #print('Class', cls, 'set of images flipped.')
