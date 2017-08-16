@@ -14,8 +14,9 @@ How to Use:
   
   After cloning and installing dependencies, run below command with the following options:  
     images_folder is the folder containing all the data - it resides in the same directory as main.py    
+    
     list_of_classes is a list of words e.g. (car bike) - each word represents a class that has a folder of images    
-    each class is in images_folder    
+      
     Optional flags that may be used in the training process:
         
       --mirror: type=int, default = 1. Decides if images are flipped or not. Useful when samples are limited
@@ -36,13 +37,13 @@ How to Use:
 
       --accuracy: type=float, default = 0.9. Accuracy at which session is saved to best checkpoint path
       
-    Example usage: python learn.py images_folder car bike --split 0 --flip 1 --test 0.1  
+    Example usage: python main.py images_folder car bike --split 0 --flip 1 --test 0.1  
 
-    This will run for a while and save the CNN to specified folder.
+    This will run for a while and save the CNN to same folder.
   
   Testing:
 
-  After completing a training session, the checkpoint ID of the preferred session (usually the session with highest accuracy) to use is available in the list of checkpoints. The ID is usually the accuracy of the session, so when in doubt, choose the checkpoint with the highest accuracy.
+  After completing a training session, the checkpoint ID of the preferred session (usually the session with highest accuracy) to use is available in the list of checkpoints in the same folder. The ID is usually the accuracy of the session, so when in doubt, choose the checkpoint with the highest accuracy.
   To run a test, 
     Save all images in the format "class_name (1).jpg" in a folder e.g. test_images_folder
 
