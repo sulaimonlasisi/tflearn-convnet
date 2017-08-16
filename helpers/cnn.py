@@ -17,8 +17,6 @@ import scipy
 import argparse
 from .model import createCNN
 import collections
-import pdb
-
 
 
 ###################################
@@ -28,9 +26,7 @@ def import_sample_objects(args):
   classes_file_paths = collections.OrderedDict()
   class_files = collections.OrderedDict()
   num_files = 0
-  print(args['folders'])
   for folder in args['folders']:
-    print(folder)
     classes_file_paths[folder] = os.path.join(args['image_dir'], folder, '*.*g') #this will capture png and jpg files
     class_files[folder] = sorted(glob(classes_file_paths[folder]))
     num_files+=len(class_files[folder])
@@ -39,7 +35,6 @@ def import_sample_objects(args):
   count = 0
   class_ctr = 0
   for key, value in class_files.items():
-    print(key)
     for f in value:
       try:
         img = io.imread(f)
