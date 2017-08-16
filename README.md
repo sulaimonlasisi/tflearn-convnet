@@ -16,7 +16,8 @@ How to Use:
     images_folder is the folder containing all the data - it resides in the same directory as main.py    
     list_of_classes is a list of words e.g. (car bike) - each word represents a class that has a folder of images    
     each class is in images_folder    
-    Optional flags that may be used in the training process:    
+    Optional flags that may be used in the training process:
+        
       --mirror: type=int, default = 1. Decides if images are flipped or not. Useful when samples are limited
 
       --split: type=int, default = 1. Decides if images are split or not.
@@ -50,7 +51,7 @@ How to Use:
     test_images_folder and .txt should be in the same directory as test.py
 
     Save classes in same order as you did when you entered them in command line to train
-    
+
     Execute command: "python test.py checkpoint_id classes_file.txt test_images_folder"
 
   Sample folder structure:
