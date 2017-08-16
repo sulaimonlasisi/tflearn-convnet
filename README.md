@@ -1,12 +1,16 @@
 This program intends to simplify image classification using TFLearn Convoluted Neural Networks.
+For more information about TFLearn and the parameters used here, see: http://tflearn.org/
 
 Dependencies:
-TFLearn
-Scipy
+All these dependencies have to be installed before you can use the module.
+Use the pip install command in front of each module to install.
+ImageSlicer -- pip install image_slicer
+TFLearn -- pip install tflearn
+TensorFlow -- pip install tensorflow
 
 How to Use:
 
-  After pulling this from the repository, run the below command with the following options:
+  After cloning and installing dependencies, run below command with the following options:
   
     images_folder is the folder containing all the data - it resides in the same directory as learn.py
     
