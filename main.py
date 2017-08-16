@@ -1,6 +1,6 @@
 import os, shutil, argparse
 from glob import glob
-from helper_files import prepare_images, cnn
+from helpers import prepare_images, cnn
 import collections
 
 
@@ -78,16 +78,13 @@ all directories in the folder
 dirlist = [ item for item in os.listdir(image_dir) if os.path.isdir(image_dir) ]
 if any(folder.split('_')[0] == 'split' for folder in dirlist):
   folders = [ item for item in dirlist if item.split('_')[0] == 'split' ]
-  #print(folders)
 else:
   folders = dirlist
-#print(folders)
 training_args['folders'] = folders
 training_args['image_dir'] = image_dir
 cnn.train_cnn(training_args)
 '''
-Step 5 - Delete all the splits
-         Delete all the flips as well
+Step 5 - Delete all the splits and flips
 '''
 if any(folder.split('_')[0] == 'split' for folder in folders):  
   for item in folders:

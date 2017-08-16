@@ -3,16 +3,20 @@ For more information about TFLearn and the parameters used here, see: http://tfl
 
 Dependencies:
 All these dependencies have to be installed before you can use the module.
-Use the pip install command in front of each module to install.
+Install modules as shown below:
+
 ImageSlicer -- pip install image_slicer
+
 TFLearn -- pip install tflearn
+
 TensorFlow -- pip install tensorflow
 
 How to Use:
   
   Training: 
   
-  After cloning and installing dependencies, run below command with the following options:  
+  After cloning and installing dependencies, run below command with the following options:
+
     images_folder is the folder containing all the data - it resides in the same directory as main.py    
     
     list_of_classes is a list of words e.g. (car bike) - each word represents a class that has a folder of images    
@@ -45,6 +49,7 @@ How to Use:
 
   After completing a training session, the checkpoint ID of the preferred session (usually the session with highest accuracy) to use is available in the list of checkpoints in the same folder. The ID is usually the accuracy of the session, so when in doubt, choose the checkpoint with the highest accuracy.
   To run a test, 
+  
     Save all images in the format "class_name (1).jpg" in a folder e.g. test_images_folder
 
     Save list of classes in a .txt file with each class on a separate line
@@ -59,7 +64,7 @@ How to Use:
 
   tflearn_convnet:.
 
-  ├──────helper_files
+  ├──────helpers
 
   ├──────images_folder
 

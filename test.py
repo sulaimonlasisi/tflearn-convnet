@@ -1,4 +1,4 @@
-from helper_files import cnn
+from helpers import cnn
 import argparse
 
 parser = argparse.ArgumentParser(description='Test a given classifier using an existing checkpoint id')
