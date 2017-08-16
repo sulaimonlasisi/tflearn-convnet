@@ -1,6 +1,8 @@
 import os, shutil, argparse
 from glob import glob
-from helper_files import change_image, train
+from helper_files import prepare_images, cnn
+import collections
+
 
 '''
 Main file that does the following processes needed to train images.
@@ -21,17 +23,17 @@ parser.add_argument('--size', type=int, default = 256, help='Size of image relev
 parser.add_argument('--epoch', type=int, default = 100, help='Number of epochs to run')
 parser.add_argument('--batches', type=int, default = 96, help='Size of each batch through iteration')
 parser.add_argument('--id', default = 'cnn', help='Label for the CNN that will be created')
-parser.add_argument('--test', type=float, default = 0.2, help='Fraction of samples to use for validation')
+parser.add_argument('--test', type=float, default = 0.25, help='Fraction of samples to use for validation')
 parser.add_argument('--accuracy', type=float, default = 0.9, help='Accuracy at which session is saved to best checkpoint path')
 args = parser.parse_args()
 
-cnn_args = {}
-cnn_args['size'] = args.size
-cnn_args['epoch'] = args.epoch
-cnn_args['batches'] = args.batches
-cnn_args['id'] = args.id
-cnn_args['test'] = args.test
-cnn_args['accuracy'] = args.accuracy
+training_args = collections.OrderedDict()
+training_args['size'] = args.size
+training_args['epoch'] = args.epoch
+training_args['batches'] = args.batches
+training_args['id'] = args.id
+training_args['test'] = args.test
+training_args['accuracy'] = args.accuracy
 
 
 '''
@@ -46,7 +48,7 @@ image_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), args.images
 if args.mirror == 1:
   for cls in range(len(args.classes)):    
     class_folder = os.path.join(image_dir, args.classes[cls])
-    change_image.flip_images(cls, class_folder)
+    prepare_images.flip_images(cls, class_folder)
 
 
 '''
@@ -61,7 +63,7 @@ if args.split == 1:
   for cls in range(len(args.classes)):
     #Include the number of splits as the fourth argument if 
     #you want to split it into any number other than 32   
-    change_image.split_images(cls, image_dir, args.classes[cls], args.crop)
+    prepare_images.split_images(cls, image_dir, args.classes[cls], args.crop)
 
 
 
@@ -76,26 +78,20 @@ all directories in the folder
 dirlist = [ item for item in os.listdir(image_dir) if os.path.isdir(image_dir) ]
 if any(folder.split('_')[0] == 'split' for folder in dirlist):
   folders = [ item for item in dirlist if item.split('_')[0] == 'split' ]
-  print(folders)
+  #print(folders)
 else:
   folders = dirlist
-
-cnn_args['folders'] = folders
-cnn_args['image_dir'] = image_dir
-
-train.train_image(cnn_args)
-
-
+#print(folders)
+training_args['folders'] = folders
+training_args['image_dir'] = image_dir
+cnn.train_cnn(training_args)
 '''
 Step 5 - Delete all the splits
          Delete all the flips as well
 '''
-if any(folder.split('_')[0] == 'split' for folder in dirlists):  
+if any(folder.split('_')[0] == 'split' for folder in folders):  
   for item in folders:
-    shutil.rmtree(item)
-
+    shutil.rmtree(os.path.join(image_dir, item))
 for cls in args.classes:
-  for f in glob(os.path.join(image_dir, cls,'*mirr*'):
+  for f in glob(os.path.join(image_dir, cls,'*mirr*')):
     os.remove(f)
-
-#print(dirlist)
