@@ -41,9 +41,15 @@ How to Use:
     Execute command: "python test.py checkpoint_id classes_file.txt test_images_folder"
 
   Sample folder structure:
+
   tflearn_convnet:.
+
   ├──────helper_files
+
   ├──────images_folder
+
   │   ├──────bike
+
   │   └──────car
+  
   └──────test_images_folder
