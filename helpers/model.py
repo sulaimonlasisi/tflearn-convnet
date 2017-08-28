@@ -19,7 +19,7 @@ def createCNN(args):
   model_exit_activation = 'softmax'
   max_pool_kernel_size = 2
   model_learning_rate = 0.001
-  num_classes = 2
+  num_classes = args['num_classes']
   ###################################
   # Image transformations
   ###################################
@@ -62,6 +62,7 @@ def createCNN(args):
   # 5: Max pooling layer
   network = max_pool_2d(network, max_pool_kernel_size)
   
+  
 
   # 6: Convolution layer with 64 filters
   network = conv_2d(network, size_mid_filter, filter_size, activation=model_main_activation)
@@ -71,6 +72,7 @@ def createCNN(args):
 
   # 8: Max pooling layer
   network = max_pool_2d(network, max_pool_kernel_size)
+  
   
   # 9: Fully-connected 512 node layer
   network = fully_connected(network, 512, activation=model_main_activation)

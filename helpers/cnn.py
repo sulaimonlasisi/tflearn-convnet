@@ -17,6 +17,7 @@ import scipy
 import argparse
 from .model import createCNN
 import collections
+import pdb
 
 
 ###################################
@@ -27,23 +28,36 @@ def import_sample_objects(args):
   class_files = collections.OrderedDict()
   num_files = 0
   for folder in args['folders']:
+    #print(os.path.join(args['image_dir'], folder))
     classes_file_paths[folder] = os.path.join(args['image_dir'], folder, '*.*g') #this will capture png and jpg files
     class_files[folder] = sorted(glob(classes_file_paths[folder]))
     num_files+=len(class_files[folder])
+    #print(num_files)
+  #print(class_files.items())
   allX = np.zeros((num_files, args['size'], args['size'], 3), dtype='float64')
   ally = np.zeros(num_files)
   count = 0
   class_ctr = 0
+  #print("Length of class_file is", len(class_files))
   for key, value in class_files.items():
+    #print(key)
+    #print("Length of value is", len(value))
     for f in value:
       try:
         img = io.imread(f)
-        new_img = imresize(img, (args['size'], args['size'], 3))
+        if args['mode'] != 0:
+          #mode is not RGB, converting 2-dim grayscale array to to 3-dimension RGB
+          img = np.repeat(img[...,None],3,axis=2)
+        new_img = imresize(img, (args['size'], args['size'], 3), mode = 'RGB')
         allX[count] = np.array(new_img)
+        #if count == 1:
+          #pdb.set_trace()
+          #print(allX[count])
         ally[count] = class_ctr
         count += 1
       except:
         continue
+    #print(class_ctr)
     class_ctr+=1
   return allX, ally
   
@@ -74,6 +88,7 @@ def train_cnn(args):
   cnn_args['size'] = args['size']
   cnn_args['id'] = args['id']
   cnn_args['accuracy'] = args['accuracy']
+  cnn_args['num_classes'] = args['num_classes']
   model = createCNN(cnn_args)
 
   ###################################
@@ -88,6 +103,7 @@ def train_cnn(args):
   print("Done with training")
   # Save model when training is complete to a file
   main_dir = os.path.dirname(os.path.dirname(os.getcwd()))
+  #main_dir = os.getcwd()
   model.save(os.path.join(main_dir, args['id']+'.tfl'))
   print('Network trained and saved as', os.path.join(main_dir, args['id']+'.tfl'))
 
@@ -99,15 +115,24 @@ def create_classes_list_from_file(file):
     classes_list = [x.strip('\n') for x in classes_list]
   return classes_list
 
-def create_prediction_metrics(model, size, image_dir, classes_list, metrics_array):
+def create_prediction_metrics(model, size, image_dir, classes_list, metrics_array, color_mode):
   test_count = 0
   #Crawl through directory and test all images in directory
   #Print the predicted class compared to the original class
   for directory, subdirectories, files in os.walk(image_dir):
     for file in files:
-      img = scipy.ndimage.imread(os.path.join(directory, file), mode="RGB")
-      img = scipy.misc.imresize(img, (size, size), interp="bicubic").astype(np.float32, casting='unsafe')
+      try:
+        img = io.imread(os.path.join(directory, file), mode="RGB")
+        if color_mode != 0:
+          #mode is not RGB, converting 2-dim grayscale array to to 3-dimension RGB
+          img = np.repeat(img[...,None],3,axis=2)
+        img = imresize(img, (size, size, 3), mode = 'RGB', interp="bicubic").astype(np.float32, casting='unsafe')
+      except:
+        continue
+      #img = scipy.ndimage.imread(os.path.join(directory, file), mode="RGB")
+      #img = scipy.misc.imresize(img, (size, size), interp="bicubic").astype(np.float32, casting='unsafe')
       prediction_label = model.predict_label([img])
+      #pdb.set_trace()
       print("File  name: ", file, "label: ", classes_list[prediction_label[0][0]])
       metrics_array[classes_list.index(file.split(" ")[0])][2]+=1
       if classes_list[prediction_label[0][0]] == file.split(" ")[0]:
@@ -130,19 +155,22 @@ def create_prediction_metrics(model, size, image_dir, classes_list, metrics_arra
 
 
 
-def test_cnn(ckpt_id, classes_list_file, test_folder):
+def test_cnn(ckpt_id, classes_list_file, test_folder, mode):
   '''
   These variables are the same as those used in training and must be maintained
   to ensure consistent results. Before changing these variables, change them in 
   train_cnn before training.
   '''
-  metrics_array = np.zeros([2, 3], dtype=int)
+  
   cnn_args = collections.OrderedDict()
   cnn_args['size'] = 256
   cnn_args['id'] = 'cnn'
-  cnn_args['accuracy'] = 0.9
+  cnn_args['accuracy'] = 0.8
+  classes_list = create_classes_list_from_file(classes_list_file)
+  cnn_args['num_classes'] = len(classes_list)
+  metrics_array = np.zeros([len(classes_list), 3], dtype=int)
   model = createCNN(cnn_args)
   model.load(cnn_args['id']+'.tfl.ckpt'+ckpt_id)
   classes_list = create_classes_list_from_file(classes_list_file)
-  create_prediction_metrics(model, cnn_args['size'], test_folder, classes_list, metrics_array)
+  create_prediction_metrics(model, cnn_args['size'], test_folder, classes_list, metrics_array, mode)
 

@@ -23,13 +23,17 @@ How to Use:
       
     Optional flags that may be used in the training process:
         
-      --mirror: type=int, default = 1. Decides if images are flipped or not. Useful when samples are limited
+      --horizontalflip: type=int, default = 1. Decides if images are horizontally flipped or not. Useful when samples are limited
+
+      --verticalflip: type=int, default = 1. Decides if images are vertically flipped or not. Useful when samples are limited
 
       --split: type=int, default = 1. Decides if images are split or not.
 
-      --crop': type=int, default = 32. If image is split, how many per page.
+      --splitlist: type - list. List of splits to make per image for each class. Must be same length as number of classes
 
-      --size: type=int, default = 256. Size used for image when passed into CNN
+      NOTE: The number of splits should be a value that still retains the desired feature after splitting
+
+      --size: type=int, default = 256. Size used for image when passed into CNN (Depending on the number of samples, sizes larger than 512 can cause segmentation fault)
 
       --epoch: type=int, default = 100. Number of epochs to run
 
@@ -40,10 +44,12 @@ How to Use:
       --test: type=float, default = 0.25. Fraction of samples to use for validation
 
       --accuracy: type=float, default = 0.9. Accuracy at which session is saved to best checkpoint path
-      
-    Example usage: python main.py images_folder car bike --split 0 --flip 1 --test 0.1  
 
-    This will run for a while and save the CNN to same folder.
+      --mode: type: =int, default = 0. Color mode of images. 0 is for RGB, any other value is treated as grayscale
+      
+    Example usage: python main.py cars sedan vans suvs trucks  --split 1 --horizontalflip 1 --verticalflip 1 --test 0.1 --splitlist 16 8 16 16 --accuracy 0.9 --mode 1 --epoch 50  
+
+    This will run for a while and save the CNN to same folder. Look for files beginning with cnn.tfl-xxxx. Use the highest value xxxx as the checkpoint_id argument for the test.py file when testing.
   
   Testing:
 
@@ -58,7 +64,7 @@ How to Use:
 
     Save classes in same order as you did when you entered them in command line to train
 
-    Execute command: "python test.py checkpoint_id classes_file.txt test_images_folder"
+    Execute command: python test.py checkpoint_id classes_file.txt test_images_folder --mode 1
 
   Sample folder structure:
 
